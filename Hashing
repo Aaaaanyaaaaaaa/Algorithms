@@ -1,0 +1,62 @@
+class myStructure:
+    
+    def __init__(self, sizen):
+        self.size = sizen
+        self.table= [None]*self.size
+        
+    def hash_func (self, array):
+        return ((array[1]*(1000000000+1)+array[2])% self.size)
+    
+    def insertEl(self, array, key):
+        if self.table[key]is not None:
+            unique = 0
+            for i in range(len(self.table[key])):
+                if self.table[key][i][1] == array[1] and self.table[key][i][2] == array[2]:
+                    unique = 1
+                    if self.table[key][i][0]<array[0]:
+                        self.table[key][i][0]=array[0]
+                    break
+            if(unique == 0):
+                self.table[key].append(array)
+        else:
+            self.table[key] = []
+            self.table[key].append(array)
+            
+    def lookUp(self, array, key):
+        if self.table[key] is not None:
+            for i in range(len(self.table[key])):
+                if self.table[key][i][1] == array[1] and self.table[key][i][2] == array[2]:
+                    return self.table[key][i][0]
+                else:
+                    return -1
+        else:
+            return-1
+        
+def main():
+    m = 1000249
+    n= int(input())
+    maxD = 0
+    answer=0
+    myTable =myStructure(m)
+    
+    for i in range(n):
+        array = list(map(int, input().split()))
+        array.sort()
+        minD = array[0]
+        hsh = myTable.hash_func(array)
+        el = myTable.lookUp(array, hsh)
+        p= 0
+        if el!= -1:
+            p = min(el+array[0], array[1], array[2])
+            
+        q =max(p, minD)
+        if (q>maxD):
+            maxD=q
+            answer+=1
+            
+        myTable.insertEl(array, hsh)
+    
+    print(answer)
+ 
+main()
+close
