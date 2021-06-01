@@ -1,0 +1,155 @@
+import java.io.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.*;
+ 
+ 
+ 
+public class Main {
+//    private static List<Edge> edges;
+ 
+    static class Node implements Comparable<Node>{
+        int vertex;
+        long weight;
+        public Node(int vert, long weight) {
+            this.vertex = vert;
+            this.weight= weight;
+        }
+        @Override
+        public int compareTo( Node node2)
+        {
+            if (this.weight < node2.weight)
+                return -1;
+            if (this.weight > node2.weight)
+                return 1;
+            return 0;
+        }
+    }
+ 
+    public static long [] dijkstra(List<List<Node>>  graph, int start, long d){
+        long []  dist = new  long[graph.size()];
+        PriorityQueue<Node> pq = new PriorityQueue<>();
+        Set<Integer> visited = new HashSet<>();
+ 
+        for (int i = 0; i < graph.size(); i++) {
+            dist[i] = 1000000001;
+        }
+ 
+        pq.add(new Node(start, 0));
+        dist[start] =0 ;
+ 
+        while (!pq.isEmpty()) {
+            Node n = pq.remove();
+ 
+            int vertex = n.vertex;
+            long dis = n.weight;
+            if(dis>= d){
+//                if (dis==d){
+//                    visited.add(vertex);
+//                    dist[vertex] =dis;}
+                return dist;}
+            visited.add(vertex);
+            dist[vertex]= dis;
+            for (Node i : graph.get(vertex)) {
+                if (!visited.contains(i.vertex)) {
+                    Node ver =new Node(i.vertex, Long.sum(dis, i.weight));
+                    pq.add(ver);
+ 
+                }
+ 
+ 
+ 
+            }
+        }
+        return dist;
+    }
+    public static long binSearch(long [] arr, long key) {
+        long j = 0;
+        long low = 0;
+        long high = arr.length;
+        long mid;
+        while (low < high ) {
+            mid =(long)Math.floor((high+low)/2);
+ 
+            if (key < arr[(int)mid]) {
+                high = mid;
+            } else {
+                low = mid+1;
+            }
+ 
+        }
+ 
+ 
+ 
+        return low;
+    }
+ 
+    public static BigInteger answer( long [] distFrom, long [] distTo, int taskFrom, int taskTo, long d, int vertsCount) {
+        BigInteger sum = BigInteger.valueOf(0);
+        if (distFrom[taskTo] <= d) {
+            return BigInteger.valueOf(vertsCount).multiply(BigInteger.valueOf(vertsCount-1));
+        } else {
+            Arrays.sort(distFrom);
+            Arrays.sort(distTo);
+            for (long i : distFrom) {
+ 
+                    if (i <d ) {
+                        //                    for (int j : distTo) {
+                        //                        if(i+j<= d-1) sum+=1;
+                        //                    }
+                        long j = binSearch(distTo,  d-i-1);
+//                        if (j == distTo.length) {
+//                            j=j-1;
+//                        }
+                        sum=BigInteger.valueOf(j).add(sum);
+                    }
+                }
+            return sum;
+        }
+    }
+ 
+    public static void main(String[] args) throws  Exception{
+        int vertsCount, edgesCount;
+        int taskFrom, taskTo;
+        long d;
+ 
+ 
+        long [] dist;
+ 
+        Scanner scanner = new Scanner(System.in);
+ 
+        vertsCount = scanner.nextInt() ;
+ 
+        edgesCount = scanner.nextInt() ;
+ 
+        ArrayList<List<Node> > graph =  new ArrayList<>(vertsCount);
+        ArrayList<List<Node>> graphBackward = new ArrayList<>(vertsCount);
+        for (int i = 0; i < vertsCount; i++) {
+            graph.add(i, new ArrayList<Node>());
+            graphBackward.add(i,new ArrayList<Node>());
+        }
+ 
+        for(int i = 0; i < edgesCount; i++) {
+            int vertStart = scanner.nextInt() -1;
+            int vertFin = scanner.nextInt() -1;
+            long weight = scanner.nextLong() ;
+            graph.get(vertStart).add(new Node(vertFin, weight));
+            graphBackward.get(vertFin).add(new Node(vertStart, weight));
+ 
+        }
+        taskFrom =scanner.nextInt() -1;
+ 
+        taskTo = scanner.nextInt() -1;
+        d = scanner.nextLong() ;
+//        d_int = d.intValue();
+        dist = dijkstra(graph,taskFrom,d);
+        long [] distBack = dijkstra(graphBackward, taskTo,d);
+ 
+        System.out.println(answer(dist,distBack,taskFrom,taskTo,d, vertsCount));
+ 
+ 
+ 
+ 
+ 
+    }
+}
